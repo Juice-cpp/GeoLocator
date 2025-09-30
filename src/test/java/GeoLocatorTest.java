@@ -95,7 +95,7 @@ class GeoLocatorTest {
         assertThrows(IOException.class, () -> geoLocator.getLocationForIp("8.8.8.8"));
     }
 
-    // --- Cenários 6-8: Testes do Método toString() ---
+    // --- Cenários 6-8: Testes do Metodo toString() ---
 
     @Test
     @DisplayName("Cenário 6: toString() deve formatar a saída de sucesso corretamente")
@@ -135,7 +135,7 @@ class GeoLocatorTest {
         location.setStatus("success");
         location.setIpAddress("1.2.3.4");
         location.setCountry("Brazil");
-        location.setCity(null); // Cidade é nula
+        location.setCity(null);
 
         String result = location.toString();
 
@@ -190,8 +190,7 @@ class GeoLocatorTest {
     @Test
     @DisplayName("Cenário 12: Deve lançar exceção para JSON malformado")
     void getLocationForIp_ShouldThrowExceptionForMalformedJson() throws IOException, InterruptedException {
-        // Gson lança JsonSyntaxException para JSON inválido
-        String malformedJson = "{\"status\":\"success\", \"country\":\"Canada\""; // Falta '}'
+        String malformedJson = "{\"status\":\"success\", \"country\":\"Canada\"";
         when(mockHttpResponse.statusCode()).thenReturn(200);
         when(mockHttpResponse.body()).thenReturn(malformedJson);
         when(mockHttpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(mockHttpResponse);
