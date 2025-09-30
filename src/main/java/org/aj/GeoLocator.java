@@ -12,32 +12,43 @@ public class GeoLocator {
     private static final String IPIFY_URL = "https://api.ipify.org";
     private static final String IP_API_URL = "http://ip-api.com/json/%s";
 
+    // Injetando o HttpClient para permitir testes com mocks
+    private final HttpClient httpClient;
+
+    public GeoLocator(HttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
+
+    // Construtor padrão
+    public GeoLocator() {
+        this.httpClient = HttpClient.newHttpClient();
+    }
+
     public static void main(String[] args) {
+        GeoLocator geoLocator = new GeoLocator();
         try {
             System.out.println("1. Buscando seu IP público...");
-            String publicIp = getPublicIp();
+            String publicIp = geoLocator.getPublicIp();
             System.out.println("   -> Seu IP público é: " + publicIp);
 
             System.out.println("\n2. Buscando dados de geolocalização para este IP...");
-            IpGeolocation location = getLocationForIp(publicIp);
-            System.out.println("   -> Informações encontradas.\n");
+            IpGeolocation location = geoLocator.getLocationForIp(publicIp);
+            System.out.println("   -> Informações encontradas:\n");
 
             System.out.println(location);
 
         } catch (IOException | InterruptedException e) {
             System.err.println("Ocorreu um erro durante o processo: " + e.getMessage());
-            // e.printStackTrace();
         }
     }
 
-    public static String getPublicIp() throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
+    public String getPublicIp() throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(IPIFY_URL))
                 .GET()
                 .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 200) {
             return response.body();
@@ -46,8 +57,11 @@ public class GeoLocator {
         }
     }
 
-    public static IpGeolocation getLocationForIp(String ipAddress) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
+    public IpGeolocation getLocationForIp(String ipAddress) throws IOException, InterruptedException {
+        if (ipAddress == null || ipAddress.trim().isEmpty()) {
+            throw new IllegalArgumentException("O endereço de IP não pode ser nulo ou vazio.");
+        }
+
         URI uri = URI.create(String.format(IP_API_URL, ipAddress));
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -55,7 +69,7 @@ public class GeoLocator {
                 .GET()
                 .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() != 200) {
             throw new IOException("Falha na requisição de geolocalização. Código de status: " + response.statusCode());
