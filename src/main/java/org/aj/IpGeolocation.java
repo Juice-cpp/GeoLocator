@@ -24,6 +24,15 @@ public class IpGeolocation {
     public double getLon() { return lon; }
     public String getIsp() { return isp; }
 
+    public void setIpAddress(String ipAddress) { this.ipAddress = ipAddress; }
+    public void setStatus(String status) { this.status = status; }
+    public void setCountry(String country) { this.country = country; }
+    public void setRegionName(String regionName) { this.regionName = regionName; }
+    public void setCity(String city) { this.city = city; }
+    public void setLat(double lat) { this.lat = lat; }
+    public void setLon(double lon) { this.lon = lon; }
+    public void setIsp(String isp) { this.isp = isp; }
+
     @Override
     public String toString() {
         if ("success".equals(status)) {
